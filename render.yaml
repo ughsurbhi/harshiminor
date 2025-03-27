@@ -1,10 +1,6 @@
 services:
   - type: web
-    name: flask-app
-    runtime: python
+    name: skin-tone-detector
     env: python
-    plan: free
-    buildCommand: |
-      wget -O model.h5 https://github.com/Hershy23/Color/releases/download/v2.0/model.h5
-      pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 4 -b 0.0.0.0:$PORT app:app
