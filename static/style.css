@@ -104,11 +104,17 @@ label[for="imageUpload"]:hover {
     display: none;
 }
 
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.success {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-.hidden {
-    display: none;
 }
