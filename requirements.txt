@@ -1,7 +1,7 @@
-flask
-flask-cors
-tensorflow
-numpy
-pillow
-gunicorn
-requests
+flask==2.0.1
+tensorflow-cpu==2.15.0
+pillow==9.5.0
+numpy==1.21.6
+waitress==2.1.2
+flask-cors==3.0.10
+gunicorn==20.1.0
