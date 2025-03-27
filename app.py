@@ -12,36 +12,28 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuration
-MODEL_PATH = "model.h5"  # Now using local model file
+MODEL_PATH = "model.h5"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
-SKIN_TONES = [
-    "Very Light (Type I)",
-    "Light (Type II)",
-    "Medium (Type III)", 
-    "Olive (Type IV)",
-    "Brown (Type V)",
-    "Dark (Type VI)"
-]
+SKIN_TONES = ["Type I", "Type II", "Type III", "Type IV", "Type V", "Type VI"]
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load model
+# Load model with error handling
 try:
     model = tf.keras.models.load_model(MODEL_PATH)
-    logger.info("Model loaded successfully!")
+    logger.info("Model loaded successfully")
 except Exception as e:
-    logger.error(f"Error loading model: {str(e)}")
+    logger.error(f"Model loading failed: {str(e)}")
     # Create dummy model if real one fails
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(1, input_shape=(224, 224, 3))
     ])
-    logger.warning("Using dummy model - predictions will be random")
+    logger.warning("Using dummy model")
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def home():
@@ -68,21 +60,17 @@ def predict():
         
         prediction = model.predict(img_array)
         predicted_idx = int(np.argmax(prediction, axis=1)[0])
-        confidence = float(np.max(prediction))
         
         return jsonify({
             "success": True,
             "prediction": predicted_idx,
-            "confidence": confidence,
-            "label": SKIN_TONES[predicted_idx]
+            "confidence": float(np.max(prediction)),
+            "skin_type": SKIN_TONES[predicted_idx]
         })
         
     except Exception as e:
         logger.error(f"Prediction error: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 def run_server():
     port = int(os.environ.get('PORT', 5000))
