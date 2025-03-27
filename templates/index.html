@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Tone Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Skin Tone Detector</h1>
+        <p>Upload a clear face photo to analyze skin tone</p>
+
+        <div class="upload-box">
+            <input type="file" id="imageUpload" accept="image/*" capture="camera">
+            <label for="imageUpload">Choose Image</label>
+        </div>
+
+        <div id="imagePreview">
+            <img id="preview" src="" alt="Preview">
+            <div class="loader hidden"></div>
+        </div>
+
+        <button id="predictBtn" disabled>
+            <span id="btnText">Detect Skin Tone</span>
+        </button>
+
+        <div id="result">
+            <h2>Analysis Result:</h2>
+            <p id="predictionText">No prediction yet</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

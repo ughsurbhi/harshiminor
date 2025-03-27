@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: flask-app
+    runtime: python
+    env: python
+    plan: free
+    buildCommand: |
+      wget -O model.h5 https://github.com/Hershy23/Color/releases/download/v2.0/model.h5
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app
