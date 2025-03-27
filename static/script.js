@@ -1,64 +1,84 @@
-document.getElementById("imageUpload").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    const preview = document.getElementById("preview");
-    const predictBtn = document.getElementById("predictBtn");
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = "block";
-            predictBtn.disabled = false;
-        };
-        reader.readAsDataURL(file);
-    }
-});
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('imageUpload');
+    const predictBtn = document.getElementById('predictBtn');
+    const preview = document.getElementById('preview');
+    const predictionText = document.getElementById('predictionText');
+    const loader = document.querySelector('.loader');
 
-document.getElementById("predictBtn").addEventListener("click", async function() {
-    const fileInput = document.getElementById("imageUpload");
-    const file = fileInput.files[0];
-    const predictionText = document.getElementById("predictionText");
-    const preview = document.getElementById("preview");
-    
-    if (!file) {
-        predictionText.textContent = "Please select an image first!";
-        return;
-    }
-    
-    predictionText.textContent = "Analyzing...";
-    preview.style.opacity = "0.7";  // Visual feedback
-    
-    try {
-        const formData = new FormData();
-        formData.append("file", file);
-        
-        // Use relative path for local development
-        // For production, you might need the full URL
-        const response = await fetch("/predict", {
-            method: "POST",
-            body: formData
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || "Request failed");
+    // Skin tone labels matching your model's output
+    const SKIN_TONES = [
+        "Very Light (Type I)",
+        "Light (Type II)",
+        "Medium (Type III)",
+        "Olive (Type IV)",
+        "Brown (Type V)",
+        "Dark (Type VI)"
+    ];
+
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                predictBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
         }
+    });
+
+    predictBtn.addEventListener('click', async function() {
+        const file = fileInput.files[0];
         
-        const data = await response.json();
+        if (!file) {
+            showMessage("Please select an image first!", "error");
+            return;
+        }
+
+        showLoading();
         
-        // Map predictions to human-readable labels
-        const skinTones = ["Light", "Medium-Light", "Medium-Dark", "Dark"];
-        const confidence = (data.confidence * 100).toFixed(1);
-        
-        predictionText.innerHTML = `
-            <strong>${skinTones[data.prediction] || "Unknown"}</strong>
-            <br><small>${confidence}% confidence</small>
-        `;
-        
-    } catch (error) {
-        console.error("Prediction error:", error);
-        predictionText.textContent = `Error: ${error.message}`;
-    } finally {
-        preview.style.opacity = "1";
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Prediction failed");
+            }
+
+            const confidence = (data.confidence * 100).toFixed(1);
+            showMessage(`
+                <strong>${SKIN_TONES[data.prediction] || "Unknown"}</strong>
+                <div>Confidence: ${confidence}%</div>
+            `, "success");
+            
+        } catch (error) {
+            console.error("Error:", error);
+            showMessage(error.message, "error");
+        } finally {
+            hideLoading();
+        }
+    });
+
+    function showLoading() {
+        loader.style.display = "block";
+        predictBtn.disabled = true;
+        predictionText.innerHTML = '<span class="loading">Analyzing...</span>';
+    }
+
+    function hideLoading() {
+        loader.style.display = "none";
+        predictBtn.disabled = false;
+    }
+
+    function showMessage(message, type) {
+        predictionText.innerHTML = `<span class="${type}">${message}</span>`;
     }
 });
