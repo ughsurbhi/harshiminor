@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skin Tone Detector</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -13,7 +13,7 @@
         <p>Upload a clear face photo to analyze skin tone</p>
 
         <div class="upload-box">
-            <input type="file" id="imageUpload" accept="image/*" capture="camera">
+            <input type="file" id="imageUpload" accept="image/*">
             <label for="imageUpload">Choose Image</label>
         </div>
 
@@ -32,6 +32,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
