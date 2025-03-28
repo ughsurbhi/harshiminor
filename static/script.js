@@ -82,3 +82,26 @@ document.addEventListener('DOMContentLoaded', function() {
         predictionText.innerHTML = `<span class="${type}">${message}</span>`;
     }
 });
+fetch('/your-endpoint')
+  .then(response => {
+    console.log(response.status); // Check HTTP status
+    return response.text(); // First get as text to inspect
+  })
+  .then(text => {
+    console.log("Raw response:", text);
+    try {
+      const json = JSON.parse(text);
+      console.log("Parsed JSON:", json);
+    } catch (e) {
+      console.error("JSON parse error:", e);
+    }
+  });
+// Add error handling
+fetch('/api')
+  .then(response => {
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
