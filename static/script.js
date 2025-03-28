@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const predictionText = document.getElementById('predictionText');
     const loader = document.querySelector('.loader');
 
-    // Skin tone labels matching your model's output
     const SKIN_TONES = [
         "Very Light (Type I)",
         "Light (Type II)",
@@ -44,13 +43,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const response = await fetch('/predict', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const data = await response.json();
             
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || "Prediction failed");
+            if (data.error) {
+                throw new Error(data.error);
             }
 
             const confidence = (data.confidence * 100).toFixed(1);
@@ -82,26 +88,3 @@ document.addEventListener('DOMContentLoaded', function() {
         predictionText.innerHTML = `<span class="${type}">${message}</span>`;
     }
 });
-fetch('/your-endpoint')
-  .then(response => {
-    console.log(response.status); // Check HTTP status
-    return response.text(); // First get as text to inspect
-  })
-  .then(text => {
-    console.log("Raw response:", text);
-    try {
-      const json = JSON.parse(text);
-      console.log("Parsed JSON:", json);
-    } catch (e) {
-      console.error("JSON parse error:", e);
-    }
-  });
-// Add error handling
-fetch('/api')
-  .then(response => {
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
