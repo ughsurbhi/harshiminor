@@ -38,6 +38,14 @@ def allowed_file(filename):
 @app.route('/')
 def home():
     return render_template('index.html')
+@app.route('/your-endpoint')
+def your_endpoint():
+    try:
+        data = {"key": "value"}
+        return jsonify(data)  # Ensure using Flask's jsonify
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Check server logs
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -71,7 +79,11 @@ def predict():
     except Exception as e:
         logger.error(f"Prediction error: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
+# Always ensure proper JSON responses
+@app.after_request
+def after_request(response):
+    response.headers.add('Content-Type', 'application/json')
+    return response
 def run_server():
     port = int(os.environ.get('PORT', 5000))
     if os.environ.get('ENV') == 'PRODUCTION':
